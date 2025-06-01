@@ -331,8 +331,13 @@ class Gyms_point_item(db.Model):
     #fumctions
     def Add_or_Update(item_point_id , gyms_id):
         item  = Gyms_point_item.query.filter(Gyms_point_item.item_point_id == item_point_id , Gyms_point_item.gyms_id == gyms_id).first()
-            
-        point = 0.0
+        points = Gyms_List_point.return_points( gyms_id , item_point_id)
+        
+        if points == None:
+            point = 0.0
+        else:
+            point = float(sum(points)) / float(len(points))
+        
         new_item = None
         if item == None:
             new_item = Gyms_point_item(item_point_id = item_point_id , gyms_id = gyms_id , point = point)
@@ -340,12 +345,11 @@ class Gyms_point_item(db.Model):
             db.session.add(new_item)
             db.session.commit()
             return True
-        points = Gyms_List_point.return_points( gyms_id , item_point_id)
-        if points is not None:
-            point = sum(points) / float(len(points))
+        
         #Update "Gyms_point_item" Set "Point" = (Select Avg("point") from "Gyms_List_point" where "gyms_point_item_id" = item_point_id And "gyms_id" = gyms_id) 
         # where "item_point_id" = item_point_id And "gyms_id" = gyms_id;
         item.point = point
+        db.session.refresh(item)
         db.session.commit()
         
         return True
@@ -411,8 +415,8 @@ class Gyms_List_point(db.Model):
             return jsonify({"message" : "add item point is succed"}) , 200
         
         item.point = point
-        db.session.commit()
         db.session.refresh(new_item)
+        db.session.commit()
         Gyms_point_item.Add_or_Update(gyms_point_item_id , gyms_id)
         
         return jsonify({"message" : "update successfully"}) , 200

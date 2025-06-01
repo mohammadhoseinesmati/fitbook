@@ -17,7 +17,7 @@ def add_hall():
             return jsonify({'error': f"Field '{field}' is required."}), 400
     
     name = data['Name']
-    gender = str(data['Gernder']).strip()
+    gender = str(data['Gender']).strip()
     location = data['Location']
     city_id = str(data['City']).strip()
     description = data['Description']
@@ -330,8 +330,8 @@ def add_gymoptions():
     
     try :
         hall_id = int(data["hall_id"])
-        start_time = datetime.strptime(data["start_time"], "%Y-%m-%d %H:%M:%S")
-        end_time = datetime.strptime(data["end_time"], "%Y-%m-%d %H:%M:%S")
+        start_time = data["start_time"]
+        end_time = data["end_time"]
         price = Decimal(data["price"])
         
         response = Halls_Option.add_option(hall_id , start_time , end_time , price)
@@ -373,8 +373,8 @@ def update_option():
     try :
         id = int(data["id"])
         hall_id = int(data["hall_id"])
-        start_time = datetime.strptime(data["start_time"], "%Y-%m-%d %H:%M:%S")
-        end_time = datetime.strptime(data["end_time"], "%Y-%m-%d %H:%M:%S")
+        start_time = data["start_time"]
+        end_time = data["end_time"]
         price = Decimal(data["price"])
         
         response = Halls_Option.update_option( id ,hall_id , start_time ,end_time ,  price )
@@ -392,10 +392,10 @@ def add_reservation_hall():
     data = request.get_json()
     
     try:
-        date = datetime.strprime(data["gyms_option_id"] , "%Y-%m-%d %H:%M:%S")
+        date = data["date"]
         halls_option_id = int(data["halls_option_id"])
         user_id = int(data["User_id"])
-        date_Reserve =datetime.strprime(data["date_Reserve"] , "%Y-%m-%d %H:%M:%S")
+        date_Reserve =data["date_Reserve"]
         status = bool(data["status"])
         count = int(data["count"])
         
@@ -433,10 +433,10 @@ def update_reservations():
     
     try:
         id = int(data["id"])
-        date = datetime.strprime(data["gyms_option_id"] , "%Y-%m-%d %H:%M:%S")
+        date = data["date"]
         halls_option_id = int(data["halls_option_id"])
         user_id = int(data["User_id"])
-        date_Reserve =datetime.strprime(data["date_Reserve"] , "%Y-%m-%d %H:%M:%S")
+        date_Reserve =data["date_Reserve"]
         status = bool(data["status"])
         count = int(data["count"])
         response = Halls_Reservation.Update_Reservation( id ,date , halls_option_id , user_id , date_Reserve , status , count)

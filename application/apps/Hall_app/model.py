@@ -301,22 +301,28 @@ class Halls_Point_Item(db.Model):
     def Add_or_Update(item_point_id , halls_id):
         item  = Halls_Point_Item.query.filter(Halls_Point_Item.Item_Point_id == item_point_id , Halls_Point_Item.Halls_id == halls_id).first()
             
-        point = 0.0
-        new_item = None
+        
+        points = Halls_List_Point.return_points(halls_id , item_point_id )
+        if points == None:
+            point = 0.0
+        else: 
+            point = float(sum(points)) / float(len(points))
+            return jsonify({"error" : "we dont have point"})
+            
         if item == None:
             new_item = Halls_Point_Item(Item_Point_id = item_point_id , Halls_id = halls_id , point = point)
             
             db.session.add(new_item)
             db.session.commit()
             return True
-        points = Halls_List_Point.return_points(halls_id , item_point_id )
-        if points is not None:
-            point = sum(points) / float(len(points))
+        
         
         item.point = point
+        db.session.refresh(item)
         db.session.commit()
+
         
-        return True
+        return jsonify({"message" : "update succesfully"}) , 200
     
     def selecet_by_hall(id):
         list_item = Halls_Point_Item.query.filter(Halls_Point_Item.Halls_id == id).all()
@@ -348,8 +354,8 @@ class Halls_List_Point(db.Model):
     #fumctions
     def return_points(hall_id , hall_point_item_id):
         lists = Halls_List_Point.query.filter(Halls_List_Point.Halls_Point_Item_id == hall_point_item_id , Halls_List_Point.Halls_id == hall_id).all()
-        points = [item.point for item in lists]
-           
+        points = [item.Point for item in lists]
+        print("points list: ", len(points))
         return points
     
     def selecet_by_user(id):
@@ -488,7 +494,7 @@ class Halls_Option(db.Model):
                 "start_time": option.start_time,
                 "price": str(option.Price),
                 "end_time": option.end_time,
-                "reserves": [reserve for reserve in option._reservations.all()]
+                "reserves": [reserve for reserve in option._reservations]
             })
 
         return jsonify(options_list), 200
@@ -526,11 +532,11 @@ class Halls_Reservation(db.Model):
     def Add_Reservation(date , halls_option_id , userid , date_reservation , status ,  count = None):
         try:
             new_reserve = Halls_Reservation(
-                Date = datetime.strprime(date , "%Y-%m-%d %H:%M:%S"),
+                Date = datetime.strptime(date , "%Y-%m-%d %H:%M:%S"),
                 Halls_Option_id = halls_option_id,
                 Count = count , 
                 User_id = userid ,
-                date_reservation = datetime.strprime(date_reservation , "%Y-%m-%d %H:%M:%S"),
+                date_reservation = datetime.strptime(date_reservation , "%Y-%m-%d %H:%M:%S"),
                 Status = status               
             )
             
@@ -583,18 +589,21 @@ class Halls_Reservation(db.Model):
     def Update_Reservation( id, date , halls_option_id , userid , date_reservation , status ,  count = None):
         reserve = Halls_Reservation.query.filter(Halls_Reservation.id == id).first()
         
-        if reserve is not None:
-            reserve.Date = datetime.strprime(date , "%Y-%m-%d %H:%M:%S"),
-            reserve.Halls_Option_id = halls_option_id
-            reserve.Count = count 
-            reserve.User_id = userid 
-            reserve.date_reservation = datetime.strprime(date_reservation , "%Y-%m-%d %H:%M:%S")
-            reserve.Status = status 
-            
-            db.session.commit()
-            return jsonify({"message" : "add reservation is succed"}) , 200
+        # if reserve == None:
+        #     return jsonify({"error" : "reserve was not found"}) , 400
         
-        return jsonify({"error" : "reserve was not found"}) , 400
+        reserve.Date = datetime.strptime(date , "%Y-%m-%d %H:%M:%S")
+        reserve.Halls_Option_id = halls_option_id
+        reserve.Count = count 
+        reserve.User_id = userid 
+        reserve.date_reservation = datetime.strptime(date_reservation , "%Y-%m-%d %H:%M:%S")
+        reserve.Status = status 
+        
+        
+        db.session.commit()
+        db.session.refresh(reserve)
+        return jsonify({"message" : "add reservation is succed"}) , 200
+        
     
                 
     
