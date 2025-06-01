@@ -1,0 +1,8 @@
+
+/venv
+*.pyc
+/migrations
+/.vscode
+Dockefile
+.env
+*.yml

@@ -1,0 +1,36 @@
+// // .vscode/launch.json
+// {
+//   "version": "0.2.0",
+//   "configurations": [
+//     {
+//       "name": "🔍 Debug Flask App",
+//       "type": "python",
+//       "request": "launch",
+//       "program": "${workspaceFolder}/main.py", // یا app.py یا چیزی که برنامه‌ت رو اجرا می‌کنه
+//       "env": {
+//         "FLASK_APP": "main.py", // یا app.py
+//         "FLASK_ENV": "development"
+//       },
+//       "args": ["run", "--no-debugger", "--no-reload"],
+//       "jinja": true,
+//       "console": "integratedTerminal"
+//     },
+//     {
+//   "name": "🐳 Attach to Docker Flask",
+//   "type": "python",
+//   "request": "attach",
+//   "connect": {
+//     "host": "localhost",
+//     "port": 5678
+//   },
+//   "pathMappings": [
+//     {
+//       "localRoot": "${workspaceFolder}", // پروژه در ویندوز
+//       "remoteRoot": "/app"               // مسیر داخل کانتینر
+//     }
+//   ]
+// }
+//   ]
+  
+
+// }
